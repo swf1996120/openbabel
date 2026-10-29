@@ -1560,6 +1560,13 @@ namespace OpenBabel
     if (_mod)
       return;
 
+    // A perceived formula can be regenerated while a modification batch is
+    // open. Invalidate it again when the outermost batch closes so edits made
+    // after that regeneration cannot leave an intermediate formula cached.
+    OBGenericData *formula = GetData("Formula");
+    if (formula != nullptr && formula->GetOrigin() == perceived)
+      DeleteData(formula);
+
     // wipe all but whether it has aromaticity perceived, is a reaction, or has periodic boundaries enabled
     if (nukePerceivedData)
       _flags = _flags & (OB_AROMATIC_MOL|OB_REACTION_MOL|OB_PERIODIC_MOL);

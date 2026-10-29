@@ -210,19 +210,20 @@ int mol(int argc, char* argv[])
   editedFormula.EndModify();
   editedFormula.GetFormula(); // populate the generated formula cache
   editedFormula.BeginModify();
+  editedFormula.GetFormula(); // regenerate the cache inside the edit batch
   OBAtom *oxygen = editedFormula.NewAtom();
   oxygen->SetAtomicNum(8);
   editedFormula.EndModify();
   if (editedFormula.GetFormula() == "CO")
-    cout << "ok 15" << endl;
+    cout << "ok 14" << endl;
   else
-    cout << "not ok 15 # generated formula was stale after adding an atom" << endl;
+    cout << "not ok 14 # generated formula was stale after adding an atom" << endl;
 
   carbon->SetAtomicNum(7);
   if (editedFormula.GetFormula() == "NO")
-    cout << "ok 16" << endl;
+    cout << "ok 15" << endl;
   else
-    cout << "not ok 16 # generated formula was stale after changing an atom" << endl;
+    cout << "not ok 15 # generated formula was stale after changing an atom" << endl;
   
   // Test molecular formulas with large atomic numbers
   OBMol testLgAtNo;
@@ -237,9 +238,9 @@ int mol(int argc, char* argv[])
   lgAtom->SetIsotope(2);
   testLgAtNo.EndModify();
   if ( testLgAtNo.GetFormula() == "DOg" ) {
-    cout << "ok 14" << endl;
+    cout << "ok 16" << endl;
   } else {
-    cout << "not ok 14" << endl;
+    cout << "not ok 16" << endl;
   }
   
 
@@ -257,6 +258,6 @@ int mol(int argc, char* argv[])
       std::cout << "not ok 17 # CalcTorsionAngle " << dihedral << "!= 180.0" << std::endl;
   }
 
-  cout << "1..15\n"; // total number of tests for Perl's "prove" tool
+  cout << "1..17\n"; // total number of tests for Perl's "prove" tool
   return(0);
 }
