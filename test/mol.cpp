@@ -99,8 +99,9 @@ int mol(int argc, char* argv[])
     cout << "not ok 6\n";
   }
 
+  testMol1.SetTitle("stale title");
   testMol1.Clear();
-  if (testMol1.NumAtoms() == 0) {
+  if (testMol1.NumAtoms() == 0 && string(testMol1.GetTitle()).empty()) {
     cout << "ok 7\n";
   } else {
     cout << "not ok 7\n";
