@@ -201,6 +201,28 @@ int mol(int argc, char* argv[])
   }
   // Reset the formula to test for a double delete error
   testMolFormula.SetFormula(formula);
+
+  // A generated formula must be invalidated when the molecule is edited.
+  OBMol editedFormula;
+  editedFormula.BeginModify();
+  OBAtom *carbon = editedFormula.NewAtom();
+  carbon->SetAtomicNum(6);
+  editedFormula.EndModify();
+  editedFormula.GetFormula(); // populate the generated formula cache
+  editedFormula.BeginModify();
+  OBAtom *oxygen = editedFormula.NewAtom();
+  oxygen->SetAtomicNum(8);
+  editedFormula.EndModify();
+  if (editedFormula.GetFormula() == "CO")
+    cout << "ok 15" << endl;
+  else
+    cout << "not ok 15 # generated formula was stale after adding an atom" << endl;
+
+  carbon->SetAtomicNum(7);
+  if (editedFormula.GetFormula() == "NO")
+    cout << "ok 16" << endl;
+  else
+    cout << "not ok 16 # generated formula was stale after changing an atom" << endl;
   
   // Test molecular formulas with large atomic numbers
   OBMol testLgAtNo;
@@ -229,10 +251,10 @@ int mol(int argc, char* argv[])
   double dihedral_error = fabs(dihedral) - 180.0;
 
   if (fabs(dihedral_error) < 0.001) {
-      std::cout << "ok 15 " << dihedral_error << std::endl;
+      std::cout << "ok 17 " << dihedral_error << std::endl;
   } else {
 
-      std::cout << "not ok 15 # CalcTorsionAngle " << dihedral << "!= 180.0" << std::endl;
+      std::cout << "not ok 17 # CalcTorsionAngle " << dihedral << "!= 180.0" << std::endl;
   }
 
   cout << "1..15\n"; // total number of tests for Perl's "prove" tool
