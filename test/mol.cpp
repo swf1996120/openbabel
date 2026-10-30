@@ -190,10 +190,15 @@ int mol(int argc, char* argv[])
       else
         cout << "not ok 12 # failed empty InChI" << endl;
     }
+  else
+    cout << "ok 12 # SKIP InChI format is not available" << endl;
 
   OBMol testMolFormula;
   string formula("C6");
   testMolFormula.SetFormula(formula);
+  testMolFormula.BeginModify();
+  testMolFormula.NewAtom()->SetAtomicNum(8);
+  testMolFormula.EndModify();
   if ( testMolFormula.GetFormula() == formula ) {
      cout << "ok 13" << endl;
   } else {
@@ -202,25 +207,25 @@ int mol(int argc, char* argv[])
   // Reset the formula to test for a double delete error
   testMolFormula.SetFormula(formula);
 
-  // A generated formula must be invalidated when the molecule is edited.
+  // Generated formulas are computed on demand, including during an edit batch.
   OBMol editedFormula;
   editedFormula.BeginModify();
   OBAtom *carbon = editedFormula.NewAtom();
   carbon->SetAtomicNum(6);
   editedFormula.EndModify();
-  editedFormula.GetFormula(); // populate the generated formula cache
+  editedFormula.GetFormula();
   editedFormula.BeginModify();
-  editedFormula.GetFormula(); // regenerate the cache inside the edit batch
+  editedFormula.GetFormula();
   OBAtom *oxygen = editedFormula.NewAtom();
   oxygen->SetAtomicNum(8);
   editedFormula.EndModify();
-  if (editedFormula.GetFormula() == "CO")
+  if (editedFormula.GetFormula() == "CO" && !editedFormula.GetData("Formula"))
     cout << "ok 14" << endl;
   else
     cout << "not ok 14 # generated formula was stale after adding an atom" << endl;
 
   carbon->SetAtomicNum(7);
-  if (editedFormula.GetFormula() == "NO")
+  if (editedFormula.GetFormula() == "NO" && !editedFormula.GetData("Formula"))
     cout << "ok 15" << endl;
   else
     cout << "not ok 15 # generated formula was stale after changing an atom" << endl;
